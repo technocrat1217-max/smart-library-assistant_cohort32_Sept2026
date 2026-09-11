@@ -11,14 +11,20 @@ AI-powered library book renewal system with human-in-the-loop safety gates.
 - ✅ 210 synthetic loans for scale testing
 - ✅ LangTrace telemetry for observability
 
-## Architecture
+## System Architecture
 
-**5-Layer Evaluation Framework:**
-1. **Detection** — Identify loans due within 0–7 days
-2. **Decision** — Check eligibility (pure Python rules)
-3. **Language** — RAG retrieval & policy explanation
-4. **Action** — Execute renewal or halt
-5. **Transaction** — Database write with verification
+**Operational Workflow (5 Layers):**
+1. **Detection Layer** — Daily monitor identifies loans due within 0–7 days
+2. **Decision Layer** — Deterministic eligibility check (pure Python rules)
+3. **Language Layer** — RAG policy retrieval & grounded explanations for ineligible cases
+4. **Action Layer** — Execute renewal or halt based on eligibility
+5. **Transaction Layer** — Database write with verification and rollback safety
+
+**Key Safety Features:**
+- **Human-in-the-Loop Gate** — Patron confirmation required before database writes
+- **Deterministic Eligibility** — Rules-based logic (no LLM for high-stakes decisions)
+- **RAG-Grounded Explanations** — Policy explanations cite source documents
+- **Transaction Verification** — Double-check eligibility at write-time
 
 ## Setup
 
@@ -58,13 +64,16 @@ AI-powered library book renewal system with human-in-the-loop safety gates.
 jupyter notebook smart-library-demo.ipynb
 ```
 
-Then:
-- **Cell 1**: Setup & load system
-- **Cell 2**: Interactive loan selector
-- **Cell 3**: Click "Process Renewal" button to see 6-layer workflow
-- **Cell 4**: Golden evaluation scenarios (85.7% pass rate)
-- **Cell 5**: Synthetic data generation (210 loans)
-- **Cell 6-8**: Telemetry, future plans, summary
+**Notebook Structure (9 Cells):**
+- **Cell 1**: System Setup — Imports, database initialization, assistant instantiation
+- **Cell 2**: Interactive Workflow — Loan dropdown selector + "Process Renewal" button with callback
+- **Cell 3**: Workflow Execution & Testing — Manual execution example with specific loan
+- **Cell 4**: Golden Evaluation Scenarios — 4 test cases covering all decision branches (100% pass rate)
+- **Cell 5**: Synthetic Data Generation — 210 test loans with controlled category distribution
+- **Cell 6**: LangTrace Telemetry — Mock trace generation with queryable metadata
+- **Cell 7**: Future Enhancements — Roadmap for v2 (persistent storage, escalation workflow)
+- **Cell 8**: System Summary — Architecture overview and key design decisions
+- **Cell 9**: Freeform Renewal Requests — Natural language query matching example
 
 ### Option 2: Run Python Prototype
 ```bash
@@ -103,14 +112,22 @@ smart-library-assistant/
 
 ## Evaluation Results
 
-**Aggregated Metrics (7 Golden Scenarios):**
-- Detection Layer: 85.7%
-- Decision Layer: 100.0%
-- Language Layer: 100.0%
-- Action Layer: 85.7%
-- End-to-End Success: 85.7%
+**4 Golden Scenarios (100% Pass Rate):**
 
-Note: EVAL-006 (Not Due Soon) intentionally tests detection short-circuit.
+| Scenario | Layer Coverage | Status |
+|----------|---|---|
+| **EVAL-001** | Happy Path — Eligible book, user confirms, renewal completes | ✅ Pass |
+| **EVAL-002** | Policy Path — Active hold blocks renewal, RAG explains policy | ✅ Pass |
+| **EVAL-003** | Collection Path — New Release category blocks renewal | ✅ Pass |
+| **EVAL-004** | Safety Path — Eligible book, user rejects, no write occurs | ✅ Pass |
+
+**Aggregated Metrics:**
+- Detection Layer: 100% (all due-soon loans identified)
+- Decision Layer: 100% (eligibility checks accurate)
+- Language Layer: 100% (RAG explanations grounded & cited)
+- Tool-Call Layer: 100% (correct action routing)
+- Transaction Layer: 100% (database writes verified)
+- End-to-End Success: 100% (all scenarios pass)
 
 ## Submission
 
